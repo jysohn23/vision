@@ -5,6 +5,7 @@ from .utils import load_state_dict_from_url
 
 __all__ = ['ResNet', 'resnet18', 'resnet34', 'resnet50', 'resnet101',
            'resnet152', 'resnext50_32x4d', 'resnext101_32x8d',
+           'resnext101_32x48d', 'resnext101_32x4d',
            'wide_resnet50_2', 'wide_resnet101_2']
 
 
@@ -86,6 +87,7 @@ class Bottleneck(nn.Module):
         super(Bottleneck, self).__init__()
         if norm_layer is None:
             norm_layer = nn.BatchNorm2d
+        # width = intermediate_num_channels = int(out_channels * (width_per_group|#C / 64.)) * 32|#group
         width = int(planes * (base_width / 64.)) * groups
         # Both self.conv2 and self.downsample layers downsample the input when stride != 1
         self.conv1 = conv1x1(inplanes, width)
@@ -303,6 +305,16 @@ def resnext50_32x4d(pretrained=False, progress=True, **kwargs):
                    pretrained, progress, **kwargs)
 
 
+def resnext101_32x4d(**kwargs):
+    r"""ResNeXt-101 32x4d model from
+    `"Aggregated Residual Transformation for Deep Neural Networks" <https://arxiv.org/pdf/1611.05431.pdf>`_
+    """
+    kwargs['groups'] = 32
+    kwargs['width_per_group'] = 4
+    return _resnet('resnext101_32x4d', Bottleneck, [3, 4, 23, 3],
+                    False, False, **kwargs)
+
+
 def resnext101_32x8d(pretrained=False, progress=True, **kwargs):
     r"""ResNeXt-101 32x8d model from
     `"Aggregated Residual Transformation for Deep Neural Networks" <https://arxiv.org/pdf/1611.05431.pdf>`_
@@ -315,6 +327,16 @@ def resnext101_32x8d(pretrained=False, progress=True, **kwargs):
     kwargs['width_per_group'] = 8
     return _resnet('resnext101_32x8d', Bottleneck, [3, 4, 23, 3],
                    pretrained, progress, **kwargs)
+
+
+def resnext101_32x48d(**kwargs):
+    r"""ResNeXt-101 32x48 model from
+    `"Aggregated Residual Transformation for Deep Neural Networks" <https://arxiv.org/pdf/1611.05431.pdf>`_
+    """
+    kwargs['groups'] = 32
+    kwargs['width_per_group'] = 48
+    return _resnet('resnext101_32x48d', Bottleneck, [3, 4, 23, 3],
+                    False, False, **kwargs)
 
 
 def wide_resnet50_2(pretrained=False, progress=True, **kwargs):
